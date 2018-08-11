@@ -2,9 +2,9 @@ pragma solidity ^0.4.24;
 
 import "./AbstractBallotMintableBurnableToken.sol";
 
-/*
- * 机构平台币,如交易所
- * authored by luozx@1264995828@qq.com
+/**
+ * @title 机构平台币,如交易所
+ * @author luozx@1264995828@qq.com
  * 2017-06-31
  */
 contract OrgCoin is AbstractBallotMintableBurnableToken {
@@ -21,7 +21,7 @@ contract OrgCoin is AbstractBallotMintableBurnableToken {
     //---------------------------------------------------------------------------------//
 
     /*
-     * 构造器: 初始化 7个平台币管理员
+     * @dev 构造器: 初始化 7个平台币管理员
      */
     constructor(uint8 coin_mint_successPercent, uint8 asset_transfer_successPercent, uint8 admin_add_successPercent, uint8 admin_del_successPercent)
         AbstractBallotMintableBurnableToken(coin_mint_successPercent, asset_transfer_successPercent, admin_add_successPercent, admin_del_successPercent){
@@ -60,8 +60,8 @@ contract OrgCoin is AbstractBallotMintableBurnableToken {
         init(tokenName_, decimals_, tokenSymbol_, adminCount_);
     }
 
-    /*
-     * 重写实现 init
+    /**
+     * @dev 重写实现 init
      */
     function init(string tokenName_, uint256 decimals_, string tokenSymbol_, uint256 adminCount_) internal {
         name = tokenName_;
@@ -71,7 +71,9 @@ contract OrgCoin is AbstractBallotMintableBurnableToken {
         setAdminCount(adminCount_);
     }
     
-    // AdminManager.sol要求初始化 须要的参数
+    /**
+     * @dev AdminManager.sol要求初始化 须要的参数
+     */
     function setAdminCount(uint256 adminCount_) internal {
         adminCount = adminCount_;
     }

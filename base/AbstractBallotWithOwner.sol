@@ -3,15 +3,17 @@ pragma solidity ^0.4.24;
 import "../node_modules/openzeppelin-solidity/contracts/ownership/Ownable.sol";
 import "./AbstractBallot.sol";
 
-/*
- * 重置指定的投票事件
- * authored by luozx@1264995828@qq.com
- * 2017-07-31
+/**
+ * @title 引入owner的是非事件投票器
+ * @dev 抽象合约, 其中owner一般指集体代表,如 董事长\CEO角色之人
+ *将"重置指定的投票事件状态"改为由owner执行即可.
+ * @author luozx@1264995828@qq.com
+ * 2018-05-22
  */
 contract AbstractBallotWithOwner is Ownable, AbstractBallot {
-    
-    /*
-     * 重置指定的投票事件
+    /**
+     * @dev 重置指定的投票事件状态, 仅仅owner可以操作
+     * 覆盖 resetCurrentBallotAffair
      */
     function resetCurrentBallotAffair(string affairName) onlyOwner public {
         require(bytes(affairName).length != 0);

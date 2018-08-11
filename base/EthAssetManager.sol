@@ -5,10 +5,10 @@ import "../node_modules/openzeppelin-solidity/contracts/access/rbac/RBAC.sol";
 import "./AdminManager.sol";
 import "./LibString.sol";
 
-/*
- * 合约中的资产转移事件投票 
- * authored by luozx@1264995828@qq.com
- * 2017-07-31
+/**
+ * @title 合约中的ETH资产转移事件投票 
+ * @author luozx@1264995828@qq.com
+ * 2018-05-23
  */
 contract EthAssetManager is AdminManager {
     using LibString for string;
@@ -21,9 +21,9 @@ contract EthAssetManager is AdminManager {
     // 等待 转移的eth资产
     uint256 pendingEthTransferAmount;
     address pendingEthTo;
-    /*
-     * 构造方法
-     * successPercent：投票通过数量百分比*100
+    /**
+     * @dev 构造方法
+     * 各successPercent：投票通过数量百分比*100
      */
     constructor(uint8 asset_transfer_successPercent, uint8 admin_add_successPercent, uint8 admin_del_successPercent) AdminManager(admin_add_successPercent, admin_del_successPercent) {
         // 投票事件启停标识器
@@ -43,9 +43,13 @@ contract EthAssetManager is AdminManager {
             
             return;
         }
+        // !!!!!!如果 参数affairName 不匹配 affairName_asset_transfer, 那么肯定是需要匹配继承链的上游的 投票事务名
         super.execute(affairName);
     }
     
+    /**
+     * @dev 由 owner 预设定计划转移的eth数量
+     */
     function setAssetTransferAmount(string affairName, uint256 value_, address pendingEthTo_) onlyOwner checkBallotFinished(affairName) public {
         require(this.balance >= value_ && pendingEthTo_ != address(0x0));
         pendingEthTransferAmount = value_;

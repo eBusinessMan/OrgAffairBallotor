@@ -1,9 +1,9 @@
 pragma solidity ^0.4.24;
 
-/*
- * 针对是否事件的投票器
- * authored by luozx@1264995828@qq.com
- * 2017-07-31
+/**
+ * @title 针对是否事件的投票器
+ * @author luozx@1264995828@qq.com
+ * 2018-04-31
  */
 contract AbstractBallot {
 
@@ -30,7 +30,10 @@ contract AbstractBallot {
         _;
     }
 
-    // 判断 投票事件 是否已经结束
+    /**
+     * 判断当前版本的 投票事件 是否已经结束, 防止一些投票参看指标在投票过程中被恶意修改.
+     * 如投票添加管理员, 此modifier可以防止在投票中途有人恶意将 预定管理员 给替换掉
+     */
     modifier checkBallotFinished(string affairName){
         require(ballotAffairsMap[keccak256(affairName)].isBalloting == false);
         _;
@@ -41,24 +44,15 @@ contract AbstractBallot {
     // 投票结束事件
     event BallotEnd(string affairName, uint8 affairVersion);
 
-    // 投票成功执行具体事务
-    function execute(string affairName) internal;
-
-    // 很想在这里就实现一个总开关,可是不建议! 因为不想引入 onlyOwner ! 交由子类来实现吧,即 由子类继承Owner.sol
-    function resetCurrentBallotAffair(string affairName) public;
-    
-    // 要求初始化 须要的参数: 投票人总个数
-    function getAdminCount() internal returns(uint256);
-
-    /*
-    * 投票决定启动挖矿, 超过半数管理员则可以删除矿工
-    * 仅允许平台币管理员投票
-    */
+    /**
+     * 投票决定启动挖矿, 超过一定比例则执行具体事务:execute(affairName)
+     * 仅允许平台币管理员投票
+     */
     function doBallot(string affairName) public checkPermission {
         require(bytes(affairName).length != 0);
         
         Ballot affairBallot = ballotAffairsMap[keccak256(affairName)];
-        // 标识正在投票
+        // 标识正在投票, 可以通过checkBallotFinished(string affairName)来防止投票过程中一些待定项被恶意修改
         affairBallot.isBalloting = true;
         uint8 affairVersion = affairBallot.affairVersion;
         mapping (bytes32 => bool) ballotedMembersMapping = affairBallot.ballotedMembersMapping;
@@ -83,7 +77,27 @@ contract AbstractBallot {
         }
     }
     
-    function lookUpballotAffairByName(string affairName) public 
+    /** 
+     * 重置 投票事务affairName 的投票状态, 主要用于投票过程中出现意外,需要重新投票. tips: 建议从集体中选出一个专门服务集体的角色,如CEO之类. 
+     * 不过建议此function的执行由 集体指定人员 来执行, 例如选出来的董事長\CEO角色的人, 这样的话结合 onlyOwner.sol 使用相对适合.
+     */
+    function resetCurrentBallotAffair(string affairName) public checkPermission {
+        require(bytes(affairName).length != 0);
+        
+        Ballot affairBallot = ballotAffairsMap[keccak256(affairName)];
+        // 强制标识当前投票已经结束
+        affairBallot.isBalloting = false;
+        // 更新此事务的版本
+        affairBallot.affairVersion ++;
+        // 重置投票数为0
+        affairBallot.ballotedMemsCount = 0;
+    }
+    
+    /**
+     * 通过事件名称查看事件投票进展状况
+     *
+     */
+    function lookUpballotAffairByName(string affairName) public view
         returns(string affairNameX, bool isBallotingX, uint256 affairVersionX, uint256 ballotedMemsCountX, uint256 successPercentX){
         Ballot affairBallot = ballotAffairsMap[keccak256(affairName)];
         affairNameX = affairName;
@@ -92,4 +106,11 @@ contract AbstractBallot {
         ballotedMemsCountX = affairBallot.ballotedMemsCount;
         successPercentX = affairBallot.successPercent;
     }
+    
+    /** 投票成功执行具体事务, 由子合约实现. */
+    function execute(string affairName) internal;
+
+    /** 要求初始化 须要的参数: 投票人总个数 */
+    function getAdminCount() internal returns(uint256);
+
 }
