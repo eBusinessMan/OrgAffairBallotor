@@ -57,7 +57,9 @@
    ```
    * step3 <br>
     将 本库中的base目录以及目录下代码 copy 到 你的项目的根目录下.
-
+   * step4 <br>
+    如何扩展更多的投票事务,可以仿照 AdminManager.sol 的写法即可.
+    
 # 扩展注意点
   * AbstractBallot.sol的抽象function execute(string affairName) 的实现,需要特别注意继承链上的 affairName的匹配以及及时return终止.
   ```js
