@@ -46,7 +46,7 @@
         // 务必判断是否匹配affairName
         if(affairName_asset_transfer.equals(affairName)){
             pendingEthTo.send(pendingEthTransferAmount);
-            emit AssetTransfered(pendingEthTransferAmount, pendingEthTo,                        ballotAffairsMap[keccak256(affairName_asset_transfer)].ballotedMemsCount);
+            emit AssetTransfered(pendingEthTransferAmount, pendingEthTo,ballotAffairsMap[keccak256(affairName_asset_transfer)].ballotedMemsCount);
             
             return;
         }
